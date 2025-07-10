@@ -715,17 +715,19 @@ where
     }
 
     /// Encode a single sequence
-    fn encode_single_sequence(
+    pub fn encode_single_sequence(
         &self,
         sequence: InputSequence,
         type_id: u32,
         offsets_type: OffsetType,
     ) -> Result<Encoding> {
         let encode = |is_pre_tokenized, subseq_idx, subseq| -> Result<Encoding> {
-            let normalized = self
+            let normalized:PreTokenizedString = self
                 .added_vocabulary
                 .extract_and_normalize(self.normalizer.as_ref(), subseq);
+            println!("728:{:?}", normalized);
             let pre_tokenized = self.do_pre_tokenize(normalized)?;
+            println!("730:{:?}", pre_tokenized);
             let subseq_encoding = self.do_tokenize(
                 pre_tokenized,
                 type_id,
@@ -736,6 +738,7 @@ where
                 },
                 offsets_type,
             )?;
+            println!("741:{:?}", subseq_encoding);
 
             Ok(subseq_encoding)
         };
@@ -836,6 +839,7 @@ where
 
         // Encode each sequence
         let encoding = self.encode_single_sequence(sequence, 0, OffsetType::Byte)?;
+        println!("839:{:?}", encoding.get_tokens());
         let pair_encoding = pair
             .map(|sequence| self.encode_single_sequence(sequence, 1, OffsetType::Byte))
             .transpose()?;
